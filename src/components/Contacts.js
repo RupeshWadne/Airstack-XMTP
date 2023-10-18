@@ -246,19 +246,19 @@ const Contacts = (props) => {
           </div>
           <div className={styles.SearchResults}>
             {
-              results.data?.Poaps?.Poap.map((poap) => {
+              results.data?.Poaps?.Poap.map((poap, index) => {
                 const address = poap.owner.identity
                 return (
-                  <div className={styles.box}>
+                  <div key={index} className={styles.box}>
 
                     <p className={styles.name}>{poap?.owner.identity}</p>
 
                     <p className={styles.name}>{poap?.owner.primaryDomain?.name}</p>
 
                     <div>
-                      {poap?.owner.socials?.map((social) => {
+                      {poap?.owner.socials?.map((social, index) => {
                         return (
-                          <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                          <div key={index} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
                             <p><span>{social.dappName}: </span>{social.profileName}</p>
                             
                             {social.profileImage ? <img style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "100%", marginLeft: "10px"}} src={social.profileImage} /> : ""}
