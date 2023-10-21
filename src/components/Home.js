@@ -4,6 +4,7 @@ import { Client } from "@xmtp/xmtp-js";
 
 import React, { useEffect, useState, useRef } from "react";
 import Chat from "./Chat";
+import NewChat from "./NewChat"
 import styles from "./Home.module.css";
 import Contacts from "./Contacts"
 
@@ -19,6 +20,7 @@ export default function Home() {
   const [isOnNetwork, setIsOnNetwork] = useState(false);
   const [showContactsList, setShowContactList] = useState(true);
   const [selectedContact, setSelectedContact] = useState(null)
+  const [showChat, setShowChat] = useState(true)
 
   // Function to load the existing messages in a conversation
   const newConversation = async function (xmtp_client, addressTo) {
@@ -46,7 +48,7 @@ export default function Home() {
   const initXmtp = async function () {
     const startConvo = async(contactToInit) => {
       const xmtp = await Client.create(signer, { env: "production" });
-      //Create or load conversation with Gm bot
+      //Create or load conversation
       newConversation(xmtp, contactToInit.address);
       // Set the XMTP client in state for later use
       setIsOnNetwork(!!xmtp.address);
@@ -84,13 +86,13 @@ export default function Home() {
 
   useEffect(() => {
     const startConvo = async() => {
-      const xmtp = await Client.create(signer, { env: "production" });
-      //Create or load conversation with Gm bot
+      const xmtp = clientRef.current
+      //Create or load conversation with selected contact
       newConversation(xmtp, selectedContact.address);
       // Set the XMTP client in state for later use
       setIsOnNetwork(!!xmtp.address);
       //Set the client in the ref
-      clientRef.current = xmtp;
+      
     }
 
 
@@ -104,13 +106,13 @@ export default function Home() {
       {/* Display the ConnectWallet component if not connected */}
       {!isConnected && (
         <div className={styles.thirdWeb}>
-          <ConnectWallet className={styles.button}/>
+          <ConnectWallet />
         </div>
       )}
       {/* Display XMTP connection options if connected but not initialized */}
       {isConnected && !isOnNetwork && (
         <div className={styles.xmtp}>
-          <ConnectWallet className={styles.button}/>
+          <ConnectWallet />
           <button onClick={initXmtp} className={styles.btnXmtp}>
             Connect to XMTP
           </button>
@@ -118,16 +120,22 @@ export default function Home() {
       )}
       {/* Render the Chat component if connected, initialized, and messages exist */}
       {isConnected && isOnNetwork && messages && !showContactsList ? (
-        <Chat
+        <NewChat
           client={clientRef.current}
           conversation={convRef.current}
           messageHistory={messages}
           selectedContact={selectedContact}
           setShowContactList={setShowContactList}
+          showChat={showChat} 
+          setShowChat={setShowChat}
         />
       ) : isConnected && isOnNetwork && messages &&
         (
-          <Contacts loadConversations={loadConversations} setSelectedContact={setSelectedContact} setShowContactList={setShowContactList} />
+          <Contacts client={clientRef.current}
+          conversation={convRef.current}
+          messageHistory={messages}
+          selectedContact={selectedContact} loadConversations={loadConversations} setSelectedContact={setSelectedContact} setShowContactList={setShowContactList}
+          showChat={showChat} setShowChat={setShowChat} />
         )
       }
     </div>

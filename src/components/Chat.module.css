@@ -1,17 +1,20 @@
 
  
 .Chat{
-    background-color: white;
+    height: 85vh;
+    width: 60vw;
+    justify-content: center;
+    background-color: #0F0F0F;
     margin: 0;
-    color:black;
+    color: #FDF0F0;
     padding: 0;
-    font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    width:100%;
-    justify-content: center;
-    margin: 0;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .result {
+    margin-top: 80px;
   }
   
   .messageContainer {
@@ -26,18 +29,22 @@
   .inputContainer {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 60vw;
+    margin: auto;
     padding: 10px;
     border-top: 1px solid #ccc;
   }
   
   .inputField {
-    width: 100%;
+    width: 50%;
     padding: 12px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 3px solid #8CABFF;
+    background-color: #282A3A;
     border-radius: 4px;
     outline: none;
-    color: #555;
+    color: #FDF0F0;
     box-sizing: border-box;
   }
   
@@ -46,11 +53,12 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 12px;
-    font-size: 16px;
     color: #555;
     cursor: pointer;
     margin-left: 10px;
-    outline: none;
+    outline: #0F0F0F;
+    border-radius: 10px;
+    box-shadow: rgba(255, 255, 255, 0.4) 0px 2px 4px, rgba(255, 255, 255, 0.3) 0px 7px 13px -3px, rgba(255, 255, 255, 0.2) 3px -3px 3px inset;
   }
   
   .sendButton:active {
@@ -72,24 +80,28 @@
   }
   
   .backButton {
-    width: 70px;
+    height: 40px;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
     border-radius: 4px;
     padding: 12px;
-    font-size: 16px;
     color: #555;
     cursor: pointer;
-    margin-left: 10px;
-    outline: none;
+    margin-left: 50px;
+    margin-top: 20px;
+    outline: #0F0F0F;
+    border-radius: 10px;
+    box-shadow: rgb(253, 253, 253) 0px 2px 4px, rgb(255, 255, 255) 0px 7px 13px -3px, rgb(255, 255, 255) 0px 3px 0px;
   }
   
   .Contacts{
-    background-color: white;
+    background-color: #0F0F0F;
     margin: 0;
-    color:black;
+    color: #FDF0F0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: fit-content;
     width:100%;  
     margin: 0;
   }
@@ -97,9 +109,14 @@
   .searchInput {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    position: fixed;
+    width: 100%;
+    height: 10vh;
     padding-right: 10px;
     padding-left: 10px;
-    margin-top: 10px;
   }
   
   .searchInput button {
@@ -115,7 +132,6 @@
     margin-top: 50px;
     margin-bottom: 50px;
     padding: 20px;
-    border: 1px solid #ccc;
   }
   
   .SearchResults button {
@@ -124,28 +140,36 @@
   }
 
   .contacts {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    gap: 30px;
-    margin-top: 20px;
+    display: flex;
+    margin-top: 50px;
     margin-left: 20px;
+    margin-bottom: 20px;
+    
+  }
+
+  .chats {
+    padding-right: 10px;
+    border-right: 2px solid #8CABFF;
+    margin-top: 50px;
   }
 
   .contact {
-    border: 1px solid gray;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 60px 40px -7px;
-    border: 3px solid rgba(3, 102, 214, 0.3);
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 50px;
-    width: 350px;
+    border-bottom: 3px solid rgba(3, 102, 214, 0.3);
+    width: 280px;
     cursor: pointer;
+    text-align: center;
   }
 
   .contact > p {
-    font-size: small;
-    font-weight: 600;
-    color: purple;
+    font-size: x-small;
+    font-weight: 500;
+    color: #8CABFF;
+  }
+
+  .contact > h3 {
+    font-size: medium;
+    color: #DA0C81;
+    margin-bottom: 0;
   }
 
   .box {
@@ -196,12 +220,15 @@
     justify-content: center;
     align-items: center;
     margin: auto;
-    width: 80%;
-    margin-left: 50px;
+    width: 90%;
+    margin-left: 65px;
     margin-top: 50px;
     padding-left: 20px;
     padding-top: 20px;
-    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    background-color: #1B262C;
+    border: 2px solid rgba(240, 46, 170, 0.4);
+    box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
+    border-radius: 20px;
   }
 
   .event img {
@@ -212,21 +239,37 @@
   }
 
   .button {
-    background: #000;
-    color: white;
+    background: #8CABFF;
+    color: #000000;
     padding: 10px;
-    margin-left: 50px;
+    margin-left: 80px;
     margin-top: 20px;
     border-radius: 10px;
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    box-shadow: rgba(252, 252, 252, 0.877) 0px 2px 4px, rgba(201, 201, 201, 0.753) 10px 7px 13px -3px inset;
   }
+  
 
   .btn{
-    background: #000;
-    color: white;
+    background: #8CABFF;
+    color: #000000;
     padding: 10px;
     text-decoration: none;
     cursor: pointer;
     border-radius: 10px;
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    box-shadow: rgba(252, 252, 252, 0.877) 0px 2px 4px inset;
+  }
+
+  .chat {
+    position: fixed;
+    top: 100px;
+    left: 500px;
+    padding-left: 20px;
+  }
+
+  .searchBtn {
+    background: white;
+    color: black;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px;
   }

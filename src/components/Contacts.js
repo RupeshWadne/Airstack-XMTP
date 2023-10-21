@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styles from "./Chat.module.css";
 import { init, useLazyQueryWithPagination, fetchQuery, useLazyQuery } from "@airstack/airstack-react";
+import Chat from "./Chat";
 
 init("b532399c1dcd475bbeebe849359a9355");
 
@@ -15,7 +16,7 @@ const Contacts = (props) => {
   const [variables, setVariables] = useState({
     name: ""
   })
-  const [showChat, setShowChat] = useState(true)
+
   const [loading, setLoading] = useState(true)
 
   const handleChange = (e) => {
@@ -31,7 +32,7 @@ const Contacts = (props) => {
     const res = await fetchPoapHolders(iVariables);
     console.log(res)
     setResults(res)
-    setShowChat(false)
+    props.setShowChat(false)
   }
 
   const poapHolders = `query GetAllAddressesSocialsAndENSOfPOAP($eventId: [String!]) {
@@ -48,7 +49,7 @@ const Contacts = (props) => {
         metadata
       }
     }
-      Poaps(input: {filter: {eventId: {_in: $eventId}}, blockchain: ALL, limit: 10}) {
+      Poaps(input: {filter: {eventId: {_in: $eventId}}, blockchain: ALL, limit: 100}) {
         Poap {
           owner {
             identity
@@ -84,27 +85,7 @@ const Contacts = (props) => {
       }
     }`;
 
-  const lensQuery = `query LensUser($name: Identity!) {
-    Wallet(input: {identity: $name, blockchain: ethereum}) {
-      addresses
-    }
-  }`
-
-  const fcQuery = `query FarcasterUser($name: Identity!)  {
-    Wallet(input: {identity: $name, blockchain: ethereum}) {
-      addresses
-    }
-  }`
-
   const [fetchPoapHolders, { data: poapData, loading: poapLoading, error }] = useLazyQuery(poapHolders, iVariables)
-
-  const [fetchLensUser, { data: lensData, loading: lensLoading, pagination: lensPagination }] = useLazyQueryWithPagination(
-    lensQuery, variables
-  );
-
-  const [fetchFCUser, { data: fcData, loading: fcLoading, pagination: fcPagination }] = useLazyQueryWithPagination(
-    fcQuery, variables
-  );
 
   useEffect(() => {
     resolveContactsAndProfiles();
@@ -146,30 +127,9 @@ const Contacts = (props) => {
   }
 
   const goBacktoChats = () => {
-    setShowChat(true)
+    props.setShowChat(true)
     setResults([])
   }
-
-  const searchForUsers = async function () {
-    let res;
-    if (profileName.includes(".lens")) {
-      res = await fetchLensUser(variables);
-    } else {
-      res = await fetchFCUser(variables);
-    }
-
-    setResults(res?.data?.Wallet?.addresses || []);
-  }
-
-  const handleInputChange = (e) => {
-    setResults([]);
-    setProfileName(e.target.value);
-    setVariables({
-      name: e.target.value.includes(".lens") ? e.target.value : `fc_fname:${e.target.value}`
-    })
-  }
-
-
 
   const setContactDetails = (contact) => {
     const clonedContacts = JSON.parse(JSON.stringify(contacts));
@@ -183,24 +143,7 @@ const Contacts = (props) => {
 
   const selectExistingContact = (contact) => {
     props.setSelectedContact(contact);
-    props.setShowContactList(false);
-  }
-
-  const SearchResults = () => {
-    return (
-      <div className={styles.SearchResults}>
-        <h3>{profileName}</h3>
-        {
-          results.map(r => {
-            return (
-              <div key={r}>
-                <button onClick={() => setContactDetails({ profileName, address: r })} key={r}>{r}</button>
-              </div>
-            )
-          })
-        }
-      </div>
-    )
+    // props.setShowContactList(false);
   }
 
   const event = poapData?.PoapEvents?.PoapEvent ? poapData?.PoapEvents?.PoapEvent[0] : { city: "no event found", country: "" }
@@ -214,16 +157,19 @@ const Contacts = (props) => {
             value={inputValue}
             className={styles.inputField} onChange={handleChange} />
 
-          <button className="m-4 p-2 rounded-xl border border-white" onClick={handleSubmit} >Search</button>
+          <button className={styles.searchBtn} onClick={handleSubmit} >Search</button>
         </div>
       </div>
 
-      {poapLoading && <div>Loading...</div>}
+      {poapLoading && <div>
+        <p>Wait for a minute.....</p>
+      </div>
+      }
       {error && <div>Error: {error}</div>}
 
-      {results.data && results.data?.PoapEvents?.PoapEvent && iVariables ? (
-        <div>
-          <button className={styles.button} onClick={() => { goBacktoChats() }}>back to chats</button>
+      {results.data && results.data?.PoapEvents?.PoapEvent && iVariables && !props.showChat ? (
+        <div className={styles.result}>
+          <button className={styles.button} onClick={() => { goBacktoChats() }}>Back to chats</button>
           <div className={styles.event}>
             <img src={event?.metadata.image_url} />
             <div className={styles.eventDetails}>
@@ -248,20 +194,23 @@ const Contacts = (props) => {
             {
               results.data?.Poaps?.Poap.map((poap, index) => {
                 const address = poap.owner.identity
+                const profileName = poap?.owner.primaryDomain?.name
                 return (
                   <div key={index} className={styles.box}>
 
                     <p className={styles.name}>{poap?.owner.identity}</p>
-
                     <p className={styles.name}>{poap?.owner.primaryDomain?.name}</p>
+
 
                     <div>
                       {poap?.owner.socials?.map((social, index) => {
                         return (
-                          <div key={index} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                          <div key={index} style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
+                            {social.profileImage ? <img style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "100%", marginRight: "20px" }} src={social.profileImage} /> : ""}
+
                             <p><span>{social.dappName}: </span>{social.profileName}</p>
-                            
-                            {social.profileImage ? <img style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "100%", marginLeft: "10px"}} src={social.profileImage} /> : ""}
+
+
 
                           </div>
                         )
@@ -269,9 +218,13 @@ const Contacts = (props) => {
                     </div>
 
                     {
-                      poap?.owner.xmtp && poap?.owner.xmtp?.[0].isXMTPEnabled && poap?.owner.socials[0] ?
-                        <button className={styles.btn} onClick={() => setContactDetails({ address: address })}>message</button>
-                        : <span>  XMTP disabled</span>
+
+                      poap?.owner?.xmtp && poap?.owner.xmtp?.[0].isXMTPEnabled && poap?.owner?.socials && poap?.owner?.socials[0] ?
+
+                        <button className={styles.btn} onClick={() => setContactDetails({ profileName, address: address })}>message</button>
+
+
+                        : <span style={{color: "#8CABFF"}}> XMTP disabled</span>
                     }
                   </div>
                 )
@@ -284,20 +237,38 @@ const Contacts = (props) => {
         ""
       }
       {
-        showChat ?
+        props.showChat ?
           <div className={styles.contacts}>
 
             {
-              loading ? <p>Getting Old Chats......</p>
-              :
-            contacts?.map((c) => {
-              return (
-                <div className={styles.contact} onClick={() => selectExistingContact(c)} key={c.address}>
-                  <h3>{c.profileName || "No name set"}</h3>
-                  <p>{c.address}</p>
+              loading ? <p style={{ marginTop: "20px", textAlign: "center" }}>Getting Old Chats......</p>
+                :
+                <div style={{ display: "flex" }}>
+
+                  <div className={styles.chats}>
+                    {contacts?.map((c) => {
+                      return (
+                        <div>
+                          <div className={styles.contact} onClick={() => selectExistingContact(c)} key={c.address}>
+                            <h3>{c.profileName || "No name set"}</h3>
+                            <p>{c.address}</p>
+                          </div>
+
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div className={styles.chat}>
+                    <Chat
+                      client={props.client}
+                      conversation={props.conversation}
+                      messageHistory={props.messageHistory}
+                      selectedContact={props.selectedContact}
+                      setShowContactList={props.setShowContactList}
+                    />
+                  </div>
                 </div>
-              )
-            })
             }
           </div>
           : ""

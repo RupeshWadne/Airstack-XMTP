@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import styles from "./Chat.module.css";
+import styles from "./NewChat.module.css";
 import { useAddress } from "@thirdweb-dev/react";
 
-function Chat({ client, messageHistory, conversation, setShowContactList, selectedContact }) {
+
+function NewChat({ client, messageHistory, conversation, setShowContactList, selectedContact, setShowChat }) {
   const address = useAddress();
   const [inputValue, setInputValue] = useState("");
 
@@ -30,6 +31,7 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
     if(message.senderAddress === address) {
       return "You"
     } else if(selectedContact && selectedContact.profileName !== "No web3 profile") {
+        
       return selectedContact.profileName
     } else if(selectedContact && selectedContact.address) {
       return selectedContact.address
@@ -45,7 +47,7 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
             key={message.id}
             className="messageItem"
             title="Click to log this message to the console">
-            <strong>
+            <strong style={{color: "#A3C7D6", marginRight: "5px"}}>
               {getUserName(message)}:
             </strong>
             <span>{message.content}</span>
@@ -67,13 +69,24 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
       setInputValue(event.target.value);
     }
   };
+
+  const handleBack = () => {
+    setShowContactList(true)
+    setShowChat(true)
+  }
+
   return (
     <div className={styles.Chat}>
-      <div style={{display: "flex", justifyContent: "flex-end", width: "60vw", margin: "auto"}}>
-      
-      <p>{selectedContact && selectedContact?.profileName}</p>
+      <div style={{display: "flex", justifyContent: "space-between", width: "90vw", margin: "auto"}}>
+        <button onClick={() => handleBack()} className={styles.backButton}>
+          Back
+        </button>
+        <div className={styles.profile}>
+          <p>{selectedContact?.profileName}</p>
+          <p style={{fontSize: "10px", color: "#8CABFF"}}>{selectedContact?.address}</p>
+        </div>
       </div>
-
+      
       <div className={styles.messageContainer}>
         <MessageList messages={messageHistory} />
       </div>
@@ -94,4 +107,4 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
   );
 }
 
-export default Chat;
+export default NewChat;
