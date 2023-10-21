@@ -248,8 +248,8 @@ const Contacts = (props) => {
                   <div className={styles.chats}>
                     {contacts?.map((c) => {
                       return (
-                        <div>
-                          <div className={styles.contact} onClick={() => selectExistingContact(c)} key={c.address}>
+                        <div key={c.address}>
+                          <div className={styles.contact} onClick={() => selectExistingContact(c)}>
                             <h3>{c.profileName || "No name set"}</h3>
                             <p>{c.address}</p>
                           </div>
