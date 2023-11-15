@@ -7,6 +7,8 @@ import Chat from "./Chat";
 import NewChat from "./NewChat"
 import styles from "./Home.module.css";
 import Contacts from "./Contacts"
+import LandingPage from "./LandingPage"
+import Poap from "./Poap"
 
 const BOT_ADDRESS = "0x937C0d4a6294cdfa575de17382c7076b579DC176";
 
@@ -46,7 +48,7 @@ export default function Home() {
 
   // Function to initialize the XMTP client
   const initXmtp = async function () {
-    const startConvo = async(contactToInit) => {
+    const startConvo = async (contactToInit) => {
       const xmtp = await Client.create(signer, { env: "production" });
       //Create or load conversation
       newConversation(xmtp, contactToInit.address);
@@ -57,11 +59,11 @@ export default function Home() {
     }
 
 
-    if(selectedContact) {
+    if (selectedContact) {
       startConvo(selectedContact);
-    }  else {
-      startConvo({address: BOT_ADDRESS})
-    }  
+    } else {
+      startConvo({ address: BOT_ADDRESS })
+    }
   };
 
   useEffect(() => {
@@ -79,24 +81,24 @@ export default function Home() {
           }
         }
       };
-      streamMessages();    
-      loadConversations();  
+      streamMessages();
+      loadConversations();
     }
   }, [messages, isOnNetwork]);
 
   useEffect(() => {
-    const startConvo = async() => {
+    const startConvo = async () => {
       const xmtp = clientRef.current
       //Create or load conversation with selected contact
       newConversation(xmtp, selectedContact.address);
       // Set the XMTP client in state for later use
       setIsOnNetwork(!!xmtp.address);
       //Set the client in the ref
-      
+
     }
 
 
-    if(selectedContact) {
+    if (selectedContact) {
       startConvo();
     }
   }, [selectedContact]);
@@ -105,18 +107,21 @@ export default function Home() {
     <div className={styles.Home}>
       {/* Display the ConnectWallet component if not connected */}
       {!isConnected && (
-        <div className={styles.thirdWeb}>
-          <ConnectWallet />
-        </div>
+        <LandingPage />
       )}
       {/* Display XMTP connection options if connected but not initialized */}
       {isConnected && !isOnNetwork && (
-        <div className={styles.xmtp}>
-          <ConnectWallet />
-          <button onClick={initXmtp} className={styles.btnXmtp}>
-            Connect to XMTP
-          </button>
-        </div>
+        <>
+          <div className={styles.xmtp}>
+            <ConnectWallet />
+            <button onClick={initXmtp} className={styles.btnXmtp}>
+              Connect to XMTP
+            </button>
+          </div>
+          <div>
+          <Poap />
+          </div>
+        </>
       )}
       {/* Render the Chat component if connected, initialized, and messages exist */}
       {isConnected && isOnNetwork && messages && !showContactsList ? (
@@ -126,17 +131,17 @@ export default function Home() {
           messageHistory={messages}
           selectedContact={selectedContact}
           setShowContactList={setShowContactList}
-          showChat={showChat} 
+          showChat={showChat}
           setShowChat={setShowChat}
         />
       ) : isConnected && isOnNetwork && messages &&
-        (
-          <Contacts client={clientRef.current}
+      (
+        <Contacts client={clientRef.current}
           conversation={convRef.current}
           messageHistory={messages}
           selectedContact={selectedContact} loadConversations={loadConversations} setSelectedContact={setSelectedContact} setShowContactList={setShowContactList}
           showChat={showChat} setShowChat={setShowChat} />
-        )
+      )
       }
     </div>
   );

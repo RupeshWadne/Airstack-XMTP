@@ -53,7 +53,7 @@ function NewChat({ client, messageHistory, conversation, setShowContactList, sel
             <span>{message.content}</span>
             <span className="date"> ({message.sent.toLocaleTimeString()})</span>
             <span className="eyes" onClick={() => console.log(message)}>
-              👀
+              
             </span>
           </li>
         ))}

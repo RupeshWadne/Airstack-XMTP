@@ -1,8 +1,8 @@
 .Home {
-    background-color: #0F0F0F;
+    background-image: linear-gradient(to right, rgb(249, 168, 212), rgb(216, 180, 254), rgb(129, 140, 248));
     margin: 0;
+    height: max-content;
     color: #FDF0F0;
-    height: 100vh;
   }
 
   .thirdWeb{
@@ -26,10 +26,10 @@
   }
   .xmtp {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
+    justify-content: space-between;
+    height: 10vh;
+    padding: 0 100px;
   }
   .btnXmtp {
     all: unset;

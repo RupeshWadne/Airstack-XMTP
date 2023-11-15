@@ -1,0 +1,174 @@
+.main {
+  min-height: 100vh;
+  margin: 0 70px;
+  padding: 20px 0;
+}
+
+.poaps {
+  margin: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.poap {
+  background-color: #fdfdfd;
+  position: relative;
+  color: #1f1f1f;
+  height: 60vh;
+  box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+    rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+    rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.image {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  width: 100%;
+  height: 50%;
+  object-fit: cover;
+}
+
+.btn {
+  all: unset;
+  color: black;
+  background: hsl(300, 20%, 99%);
+  border: 1px solid hsl(278, 4.1%, 89.1%);
+  cursor: pointer;
+  padding: 12px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  align-items: center;
+  box-sizing: border-box;
+  line-height: 1;
+  margin-left: 30px;
+}
+
+.event {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  color: #1f1f1f;
+  width: 90%;
+  margin-left: 65px;
+  margin-top: 50px;
+  padding-left: 20px;
+  padding-top: 20px;
+  background-color: #fdffdf;
+  border: 2px solid rgba(240, 46, 170, 0.4);
+  box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px,
+    rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px,
+    rgba(240, 46, 170, 0.05) 25px 25px;
+  border-radius: 20px;
+}
+
+.event img {
+  width: 200px;
+  object-fit: cover;
+  border: 3px solid brown;
+  border-radius: 100%;
+}
+
+.eventDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.eventDetails span,
+.box span {
+  margin-right: 10px;
+  color: hotpink;
+}
+
+.eventDetails p {
+  margin-left: 20px;
+}
+
+.SearchResults {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 50px;
+  margin: 50px 50px;
+  padding: 20px;
+}
+
+.SearchResults button {
+  text-decoration: underline;
+  cursor: hover;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  height: 100px;
+  padding: 10px;
+  color: #1f1f1f;
+  position: relative;
+  background-color: #fdfdfd;
+  border: 2px solid rgba(240, 46, 170, 0.4);
+  border-radius: 20px;
+  box-shadow: rgba(46, 169, 240, 0.4) 5px 5px, rgba(46, 185, 240, 0.3) 10px 10px,
+    rgba(46, 233, 240, 0.2) 15px 15px, rgba(46, 201, 240, 0.1) 20px 20px,
+    rgba(46, 169, 240, 0.05) 25px 25px;
+    position: relative;
+}
+
+/* .box {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  height: 50vh;
+  padding: 10px;
+  background-color: #fdfdfd;
+  border: 2px solid rgba(240, 46, 170, 0.4);
+  border-radius: 20px;
+  box-shadow: rgba(46, 169, 240, 0.4) 5px 5px, rgba(46, 185, 240, 0.3) 10px 10px,
+    rgba(46, 233, 240, 0.2) 15px 15px, rgba(46, 201, 240, 0.1) 20px 20px,
+    rgba(46, 169, 240, 0.05) 25px 25px;
+  position: relative;
+} */
+
+.box > p {
+  margin: 10px;
+}
+
+.name {
+  font-size: large;
+  font-weight: 600;
+  text-decoration: underline;
+  position: absolute;
+  top: 10vh;
+  z-index: 1;
+}
+
+.Ename {
+  font-size: large;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.id {
+  font-size: x-small;
+  font-weight: 600;
+  text-decoration: underline;
+  position: absolute;
+  top: 5vh;
+  z-index: 1;
+}
+
+.profile {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  filter: blur(2px);
+  -webkit-filter: blur(2px);
+  border-radius: 20px;
+}

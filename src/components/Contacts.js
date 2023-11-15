@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react'
 import styles from "./Chat.module.css";
 import { init, useLazyQueryWithPagination, fetchQuery, useLazyQuery } from "@airstack/airstack-react";
 import Chat from "./Chat";
+import Loading from "./Loading"
+import { ConnectWallet } from "@thirdweb-dev/react";
 
 init("b532399c1dcd475bbeebe849359a9355");
 
 const Contacts = (props) => {
   const [contacts, setContacts] = useState([]);
   const [profileName, setProfileName] = useState("");
+  const [loadingx, setLoadingx] = useState(true)
   const [results, setResults] = useState([]);
   const [inputValue, setInputValue] = useState("")
   const [iVariables, setIVariables] = useState({
@@ -16,8 +19,42 @@ const Contacts = (props) => {
   const [variables, setVariables] = useState({
     name: ""
   })
-
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState([])
+
+  const getUser = async (address) => {
+    const newQuery = ` 
+    query MyQuery {
+      Wallet(
+        input: {identity: "${address}", blockchain: ethereum}
+      ) {
+        primaryDomain {
+          name
+        }
+        socials(input: {blockchain: ethereum}) {
+          dappName
+          profileName
+          profileDisplayName
+          profileImage
+        }
+        poaps {
+          eventId
+          tokenId
+          tokenUri
+          poapEvent {
+            metadata
+          }
+        }      
+      }
+    }
+    `
+    const response = await fetchQuery(newQuery)
+
+    if (response.data.Wallet) {
+      return setUser(response?.data?.Wallet)
+    }
+    return "No web3 profile"
+  }
 
   const handleChange = (e) => {
     setInputValue(e.target.value)
@@ -64,6 +101,7 @@ const Contacts = (props) => {
               dappName
               dappSlug
               profileImage
+              profileDisplayName
               profileUrl
             }
             xmtp {
@@ -100,6 +138,7 @@ const Contacts = (props) => {
         socials {
           dappName
           profileName
+          profileDisplayName
         }        
       }
     }
@@ -107,7 +146,7 @@ const Contacts = (props) => {
     const response = await fetchQuery(newQuery)
 
     if (response.data.Wallet.socials && response.data.Wallet.socials.length > 0) {
-      return response?.data?.Wallet?.socials[0].profileName
+      return response?.data?.Wallet?.socials[0].profileDisplayName
     }
     return "No web3 profile"
   }
@@ -143,8 +182,11 @@ const Contacts = (props) => {
 
   const selectExistingContact = (contact) => {
     props.setSelectedContact(contact);
+    setUser([])
     // props.setShowContactList(false);
+    getUser(contact?.address)
   }
+
 
   const event = poapData?.PoapEvents?.PoapEvent ? poapData?.PoapEvents?.PoapEvent[0] : { city: "no event found", country: "" }
 
@@ -153,17 +195,17 @@ const Contacts = (props) => {
 
       <div>
         <div className={styles.searchInput}>
-          <input type="text" placeholder="POAP Id" id="inputField"
+          <input type="text" placeholder="POAP ID" id="inputField"
             value={inputValue}
             className={styles.inputField} onChange={handleChange} />
 
           <button className={styles.searchBtn} onClick={handleSubmit} >Search</button>
+          <ConnectWallet style={{ position: "fixed", right: "10px" }} />
         </div>
       </div>
 
-      {poapLoading && <div>
-        <p>Wait for a minute.....</p>
-      </div>
+      {poapLoading &&
+        <Loading />
       }
       {error && <div>Error: {error}</div>}
 
@@ -179,9 +221,12 @@ const Contacts = (props) => {
                 <p><span>Country: </span>{event?.country}</p>
               </div>
 
-              <p className={styles.name}>{event?.eventName}</p>
+              <p className={styles.Ename}>{event?.eventName}</p>
 
-              <p><span>Description: </span>{event?.description}</p>
+              <p>
+                <span>Description: </span>
+                {event?.description.substr(0, 300)}........
+              </p>
               <p><span>Attendies: </span>{event?.tokenMints}</p>
               <div style={{ display: 'flex' }}>
                 <p><span>From</span>{event?.startDate.slice(0, 10)}</p>
@@ -198,23 +243,54 @@ const Contacts = (props) => {
                 return (
                   <div key={index} className={styles.box}>
 
-                    <p className={styles.name}>{poap?.owner.identity}</p>
+                    <p className={styles.id}>{poap?.owner.identity}</p>
                     <p className={styles.name}>{poap?.owner.primaryDomain?.name}</p>
 
 
                     <div>
-                      {poap?.owner.socials?.map((social, index) => {
+                      {poap?.owner.socials ?
+                      
+                      poap?.owner.socials?.map((social, index) => {
+                        let url = ""
+                        if (social?.profileImage.includes("https://ipfs.infura.io")) {
+                          url = "https://ipfs.io".concat(social.profileImage.slice(22))
+                        } else if (social?.profileImage.includes("ipfs")) {
+                          url = "https://ipfs.io/ipfs/".concat(social.profileImage.slice(7))
+                        } else if(social.profileImage) {
+                          url = social.profileImage
+                        } else {
+                          url = "/pepe.gif"
+                        }
+
                         return (
-                          <div key={index} style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
-                            {social.profileImage ? <img style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "100%", marginRight: "20px" }} src={social.profileImage} /> : ""}
+                          <div key={index}>
 
-                            <p><span>{social.dappName}: </span>{social.profileName}</p>
-
-
-
+                            
+                              <img
+                                alt="profile"
+                                className={styles.profile}
+                                src={url}
+                              />
+                            
                           </div>
+                          
                         )
-                      })}
+                      })
+                    : <img
+                    alt="profile"
+                    className={styles.profile}
+                    src="/pepe.gif"
+                  /> 
+                    }
+                    <div className={styles.socials}>
+                      <a>
+                      <p>{poap?.owner.socials && poap?.owner.socials[0]?.profileDisplayName}</p></a>
+                      </div>
+
+                      <div className={styles.socials2}>
+                      <p >{poap?.owner.socials && poap?.owner.socials[1]?.profileDisplayName}</p>
+                      </div>
+
                     </div>
 
                     {
@@ -224,7 +300,7 @@ const Contacts = (props) => {
                         <button className={styles.btn} onClick={() => setContactDetails({ profileName, address: address })}>message</button>
 
 
-                        : <span style={{color: "#8CABFF"}}> XMTP disabled</span>
+                        : <span style={{ color: "#8CABFF", position: "absolute", backgroundColor: "#1f1f1f", padding: "5px", borderRadius: "5px" }}> XMTP disabled</span>
                     }
                   </div>
                 )
@@ -241,16 +317,17 @@ const Contacts = (props) => {
           <div className={styles.contacts}>
 
             {
-              loading ? <p style={{ marginTop: "20px", textAlign: "center" }}>Getting Old Chats......</p>
+              loading ? <Loading />
                 :
-                <div style={{ display: "flex" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
 
                   <div className={styles.chats}>
+                    <h3 style={{ color: "#888" }}>All Chats</h3>
                     {contacts?.map((c) => {
                       return (
                         <div key={c.address}>
                           <div className={styles.contact} onClick={() => selectExistingContact(c)}>
-                            <h3>{c.profileName || "No name set"}</h3>
+                            <h3>{c.profileName || "User"}</h3>
                             <p>{c.address}</p>
                           </div>
 
@@ -266,8 +343,12 @@ const Contacts = (props) => {
                       messageHistory={props.messageHistory}
                       selectedContact={props.selectedContact}
                       setShowContactList={props.setShowContactList}
+                      user={user}
+                      loadingx={loadingx}
+                      setLoadingx={setLoadingx}
                     />
                   </div>
+
                 </div>
             }
           </div>

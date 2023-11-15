@@ -1,10 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Chat.module.css";
+import Image from "next/image"
+import Loading from "./Loading";
 import { useAddress } from "@thirdweb-dev/react";
+import { init, useLazyQueryWithPagination, fetchQuery, useLazyQuery } from "@airstack/airstack-react";
 
-function Chat({ client, messageHistory, conversation, setShowContactList, selectedContact }) {
+init("b532399c1dcd475bbeebe849359a9355");
+
+function Chat({ client, messageHistory, conversation, setShowContactList, selectedContact, user, loadingx, setLoadingx }) {
   const address = useAddress();
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    setLoadingx(false)
+  }, [user])
+
+  console.log(user)
 
   // Function to handle sending a message
   const handleSend = async () => {
@@ -26,36 +37,35 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
       (v, i, a) => a.findIndex((t) => t.id === v.id) === i,
     );
 
-  const getUserName = (message) => {
-    if(message.senderAddress === address) {
-      return "You"
-    } else if(selectedContact && selectedContact.profileName !== "No web3 profile") {
-      return selectedContact.profileName
-    } else if(selectedContact && selectedContact.address) {
-      return selectedContact.address
-    } else {
-      return 
-    }    
-  }
+    const getUserName = (message) => {
+      if (message.senderAddress === address) {
+        return "You"
+      } else if (selectedContact && selectedContact.profileName !== "No web3 profile") {
+        return selectedContact.profileName
+      } else if (selectedContact && selectedContact.address) {
+        return selectedContact.address
+      } else {
+        return
+      }
+    }
 
     return (
-      <ul className="messageList">
+      <div className={styles.messages}>
         {messages.map((message, index) => (
-          <li
-            key={message.id}
-            className="messageItem"
-            title="Click to log this message to the console">
-            <strong>
+          <div className={getUserName(message) === "You" ? styles.message : styles.msg}>
+            <div
+              key={message.id}
+              className={getUserName(message) === "You" ? styles.you : styles.other}
+            >
+              {/* <strong>
               {getUserName(message)}:
-            </strong>
-            <span>{message.content}</span>
-            <span className="date"> ({message.sent.toLocaleTimeString()})</span>
-            <span className="eyes" onClick={() => console.log(message)}>
-              👀
-            </span>
-          </li>
+            </strong> */}
+              <span className={styles.texts}>{message.content}</span>
+              {/* <span style={{fontSize: "10px", fontWeight: "100", color: "#1f1f1f"}}> ({message.sent.toLocaleTimeString()})</span> */}
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     );
   };
 
@@ -67,30 +77,116 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
       setInputValue(event.target.value);
     }
   };
-  return (
-    <div className={styles.Chat}>
-      <div style={{display: "flex", justifyContent: "flex-end", width: "60vw", margin: "auto"}}>
-      
-      <p>{selectedContact && selectedContact?.profileName}</p>
-      </div>
 
-      <div className={styles.messageContainer}>
-        <MessageList messages={messageHistory} />
+  let url = ""
+  if (user.socials && user?.socials[0]?.profileImage.includes("https://ipfs.infura.io")) {
+    url = "https://ipfs.io".concat(user?.socials[0]?.profileImage.slice(22))
+  } else if (user.socials && user?.socials[0]?.profileImage.includes("ipfs")) {
+    url = "https://ipfs.io/ipfs/".concat(user?.socials[0]?.profileImage.slice(7))
+  } else if (user.socials && user?.socials[0]?.profileImage) {
+    url = user?.socials[0]?.profileImage
+  } else {
+    url
+  }
+
+  return (
+    <>
+      <div className={styles.Chat}>
+        {loadingx ? <Loading /> :
+          <>
+            <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", width: "100%", margin: "auto", border: "1px solid gray", borderTopLeftRadius: "30px", borderTopRightRadius: "30px", backgroundColor: "#F5F5F5" }}>
+              {url ?
+                <>
+                  <img
+                    alt="profile"
+                    style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "100%", margin: "10px", border: "2px solid black" }}
+                    src={url}
+                  />
+                  <p style={{ paddingLeft: "20px" }}>{selectedContact && user.socials && user?.socials[0]?.profileDisplayName}</p>
+                </> : <img
+                  alt="profile"
+                  style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "100%", margin: "10px", border: "2px solid black" }}
+                  src="/user.png"
+                />
+              }
+            </div>
+            {
+              user.socials && user?.socials[0]?.profileDisplayName || selectedContact && selectedContact.address ?
+                <div className={styles.messageContainer}>
+                  <MessageList messages={messageHistory} />
+                </div> :
+                <div style={{ width: "100%", flex: "1" }}></div>
+            }
+
+            <div className={styles.inputContainer}>
+              <input
+                type="text"
+                className={styles.inputField}
+                onKeyPress={handleInputChange}
+                onChange={handleInputChange}
+                value={inputValue}
+                placeholder="Type your message here "
+              />
+              <button className={styles.sendButton} onClick={handleSend}>
+                Send
+              </button>
+            </div>
+          </>
+        }
       </div>
-      <div className={styles.inputContainer}>
-        <input
-          type="text"
-          className={styles.inputField}
-          onKeyPress={handleInputChange}
-          onChange={handleInputChange}
-          value={inputValue}
-          placeholder="Type your text here "
-        />
-        <button className={styles.sendButton} onClick={handleSend}>
-          Send
-        </button>
+      <div className={styles.info}>
+        {url ?
+          <>
+            <img
+              alt="profile"
+              className={styles.hero}
+              src={url}
+            />
+
+          </> : <img
+            alt="profile"
+            className={styles.hero}
+            src="/user.png"
+          />
+        }
+        <h4>
+          {user.primaryDomain?.name}
+        </h4>
+        {/* {
+          <div>
+              <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", width: "100%", paddingLeft: "20px" }}>
+
+                <p style={{width: "80px", backgroundColor: "#1f1f1f", color: "#fff", borderRadius: "10px"}}>{user.socials && user.socials[0]?.dappName} </p>
+                <p>{user.socials && user.socials[0]?.profileDisplayName}</p>
+
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", width: "100%", paddingLeft: "20px" }}>
+
+              <p style={{width: "80px", backgroundColor: "#1f1f1f", color: "#fff", borderRadius: "10px"}}>{user.socials && user.socials[1]?.dappName}</p>
+              <p>{user.socials && user.socials[1]?.profileDisplayName}</p>
+
+            </div>
+            </div>
+        } */}
+        <div>
+        <h3 style={{textAlign: "center"}}>POAPs</h3>
+        <div className={styles.grid}>
+          {
+            user.poaps && user.poaps.map((poap) => {
+              return(
+                <div className={styles.poap}>
+                  <a href={poap.tokenUri} target="_blank">
+                  <img style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "100%"}} src={poap.poapEvent.metadata.image_url} /></a>
+                <p>{poap.eventId}</p>
+                <h5>{poap.poapEvent.metadata.name}</h5>
+                </div>
+              )
+            })
+          }
+        </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
