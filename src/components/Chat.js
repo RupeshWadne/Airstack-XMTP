@@ -52,7 +52,7 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
     return (
       <div className={styles.messages}>
         {messages.map((message, index) => (
-          <div className={getUserName(message) === "You" ? styles.message : styles.msg}>
+          <div key={index} className={getUserName(message) === "You" ? styles.message : styles.msg}>
             <div
               key={message.id}
               className={getUserName(message) === "You" ? styles.you : styles.other}
@@ -174,7 +174,7 @@ function Chat({ client, messageHistory, conversation, setShowContactList, select
           {
             user.poaps && user.poaps.map((poap) => {
               return(
-                <div className={styles.poap}>
+                <div key={poap.eventId} className={styles.poap}>
                   <a href={poap.tokenUri} target="_blank">
                   <img style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "100%"}} src={poap.poapEvent.metadata.image_url} /></a>
                 <p>{poap.eventId}</p>
